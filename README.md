@@ -1,4 +1,4 @@
-# MinotaurX Web Miner — Full Repository Documentation
+# Earnify.Mine.Bz Web Miner — Full Repository Documentation
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## 🛑 Overview
 
-**MinotaurX** is a browser-based cryptocurrency web miner and website monetization tool. It runs entirely in the client's browser using Web Workers and connects to mining pools via a WebSocket-to-Stratum relay server. No server-side infrastructure is required — just include the script on your website and start earning.
+**Earnify.Mine.Bz** is a browser-based cryptocurrency web miner and website monetization tool. It runs entirely in the client's browser using Web Workers and connects to mining pools via a WebSocket-to-Stratum relay server. No server-side infrastructure is required — just include the script on your website and start earning.
 
 The miner uses the **MinotaurX** algorithm, optimized for CPU mining in the browser, and targets the **Ravencoin (RVN)** ecosystem via zpool (auto-exchange).
 
@@ -104,35 +104,7 @@ Workers → "hashrate" data → onHashrate callback → UI update
 
 ## 📦 Installation
 
-### Option A: NPM (Recommended)
-
-```bash
-npm install minotaurx-miner
-```
-
-```javascript
-import { autoMine, start, stop, minotaurxHashrate } from "minotaurx-miner";
-```
-
-### Option B: Bundler (Webpack / Vite / Rollup)
-
-Clone or copy the source into your project:
-
-```bash
-git clone https://github.com/YOUR_USERNAME/minotaurx-miner.git
-```
-
-```javascript
-import { autoMine, start, stop } from "./src/miner.js";
-```
-
-### Option C: CDN / Script Tag (UMD)
-
-```html
-<script type="module">
-  import { autoMine, stop } from "https://unpkg.com/minotaurx-miner/dist/miner.min.js";
-</script>
-```
+###coming soon
 
 > **Note:** Socket.IO is loaded automatically by the miner — you do **not** need to include it separately.
 
@@ -143,18 +115,17 @@ import { autoMine, start, stop } from "./src/miner.js";
 ### Easiest Way — `autoMine()`
 
 ```javascript
-import { autoMine } from "minotaurx-miner";
+import { autoMine } from "earnify.mine.bz/miner.js";
 
 // Start mining with 50% of the visitor's CPU
 const threadCount = await autoMine("RWmCvzsoC7CfM5Fh6moR3g2Xk3J566nD3m", 0.5);
 
-console.log(`Mining with ${threadCount} user thread(s) + 1 dev thread`);
 ```
 
 ### Stop Mining
 
 ```javascript
-import { stop } from "minotaurx-miner";
+import { stop } from "earnify.mine.bz/miner.js";
 
 stop(); // Prints full session report to console
 ```
@@ -222,7 +193,7 @@ Start mining with full control over algorithm, pool, and callbacks.
 **Example:**
 
 ```javascript
-import { start, minotaurx } from "minotaurx-miner";
+import { start, minotaurx } from "earnify.mine.bz/miner.js";
 
 const threads = await start(
   minotaurx,                        // algorithm
@@ -254,7 +225,7 @@ Stops all mining immediately. Terminates all Web Workers, disconnects both socke
 **Example:**
 
 ```javascript
-import { stop } from "minotaurx-miner";
+import { stop } from "earnify.mine.bz/miner.js";
 stop();
 // Console output:
 // 🛑 Miner Stopped
@@ -292,7 +263,7 @@ Exported alias for the internal `hashrateTracker`. Use this to read mining stati
 **Example:**
 
 ```javascript
-import { minotaurxHashrate } from "minotaurx-miner";
+import { minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 setInterval(() => {
   document.getElementById("hashrate").textContent =
@@ -454,7 +425,7 @@ Every **10 seconds**, the miner prints a report to the console:
 ### Programmatic Access
 
 ```javascript
-import { minotaurxHashrate } from "minotaurx-miner";
+import { minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 // Read properties
 console.log(minotaurxHashrate.currentHashrateKHs);   // 12.50
@@ -551,7 +522,7 @@ onError: ({ error }) => {
   </div>
 
   <script type="module">
-    import { autoMine, stop, minotaurxHashrate } from "minotaurx-miner";
+    import { autoMine, stop, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
     let mining = false;
 
@@ -582,7 +553,7 @@ onError: ({ error }) => {
 ### Example 2: Opt-In Mining with User Consent
 
 ```javascript
-import { autoMine, stop, minotaurxHashrate } from "minotaurx-miner";
+import { autoMine, stop, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 class ConsentMiner {
   constructor(wallet, threadPercent = 0.3) {
@@ -628,7 +599,7 @@ miner.start();
 
 ```jsx
 import React, { useState, useEffect, useRef } from "react";
-import { autoMine, stop, minotaurxHashrate } from "minotaurx-miner";
+import { autoMine, stop, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 export function MinerWidget({ wallet, threadPercent = 0.5 }) {
   const [mining, setMining] = useState(false);
@@ -683,7 +654,7 @@ export function MinerWidget({ wallet, threadPercent = 0.5 }) {
 ```javascript
 // useMiner.js
 import { ref, onUnmounted } from "vue";
-import { autoMine, stop, minotaurxHashrate } from "minotaurx-miner";
+import { autoMine, stop, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 export function useMiner(wallet, threadPercent = 0.5) {
   const mining = ref(false);
@@ -742,7 +713,7 @@ const { mining, hashrate, uptime, startMining, stopMining } =
 ### Example 5: Idle Mining (Start Only When Tab is Hidden)
 
 ```javascript
-import { autoMine, stop } from "minotaurx-miner";
+import { autoMine, stop } from "earnify.mine.bz/miner.js";
 
 let mining = false;
 
@@ -764,7 +735,7 @@ document.addEventListener("visibilitychange", async () => {
 ### Example 6: Full-Control with Custom Pool
 
 ```javascript
-import { start, stop, minotaurx, minotaurxHashrate } from "minotaurx-miner";
+import { start, stop, minotaurx, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 const threads = await start(
   minotaurx,
@@ -800,7 +771,7 @@ console.log(`Mining on ${threads} user threads + 1 dev thread`);
 Use mining as your sole revenue source. Low thread allocation keeps the user experience smooth.
 
 ```javascript
-import { autoMine, stop, minotaurxHashrate } from "minotaurx-miner";
+import { autoMine, stop, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 // Start on page load with 25% CPU — barely noticeable
 await autoMine("YOUR_WALLET", 0.25);
@@ -813,7 +784,7 @@ await autoMine("YOUR_WALLET", 0.25);
 Run both. Use mining for visitors with ad-blockers.
 
 ```javascript
-import { autoMine } from "minotaurx-miner";
+import { autoMine } from "earnify.mine.bz/miner.js";
 
 // Detect ad blocker
 const adBlocked = await detectAdBlocker();
@@ -832,7 +803,7 @@ if (adBlocked) {
 Require mining consent before accessing premium content.
 
 ```javascript
-import { autoMine, stop } from "minotaurx-miner";
+import { autoMine, stop } from "earnify.mine.bz/miner.js";
 
 async function unlockContent() {
   const consent = confirm(
@@ -854,7 +825,7 @@ async function unlockContent() {
 Different thread levels for different content tiers.
 
 ```javascript
-import { autoMine, stop } from "minotaurx-miner";
+import { autoMine, stop } from "earnify.mine.bz/miner.js";
 
 function startTieredMining(tier) {
   stop(); // stop any existing mining
@@ -890,7 +861,7 @@ function startTieredMining(tier) {
 ### Complete Configuration Object
 
 ```javascript
-import { start, minotaurx } from "minotaurx-miner";
+import { start, minotaurx } from "earnify.mine.bz/miner.js";
 
 await start(
   minotaurx,    // ─── Algorithm ─────────────
@@ -1165,7 +1136,7 @@ MIT License — See [LICENSE](./LICENSE) file for details.
 
 ```javascript
 // ─── Import ─────────────────────────────────────
-import { autoMine, start, stop, minotaurx, ALL_THREADS, minotaurxHashrate } from "minotaurx-miner";
+import { autoMine, start, stop, minotaurx, ALL_THREADS, minotaurxHashrate } from "earnify.mine.bz/miner.js";
 
 // ─── Auto-mine (easiest) ────────────────────────
 const threads = await autoMine("WALLET", 0.5);
