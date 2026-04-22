@@ -3,11 +3,116 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMPUTE MONETIZATION</title>
-    <meta
-      name="description"
-      content="Convert idle CPU cycles into deterministic revenue. Zero-data. Zero-ads. Pure compute."
-    />
+
+    <!-- ✅ SINGLE title (removed the old "COMPUTE MONETIZATION" one) -->
+    <title>WebMiner — Browser-Based CPU Mining for Publishers | No Ads, No Tracking</title>
+
+    <!-- ✅ SINGLE description (removed the old vague one) -->
+    <meta name="description" content="WebMiner lets website publishers monetize traffic through browser-based CPU mining. Zero ads, zero cookies, zero data collection. 1% fee. Open source. Deploy in 5 minutes." />
+
+    <!-- Keywords -->
+    <meta name="keywords" content="web mining, browser mining, CPU monetization, publisher revenue, crypto mining website, alternative to ads, WebMiner, MinotaurX, zpool, RavenCoin, compute monetization" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://earnify.mine.bz/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://earnify.mine.bz/" />
+    <meta property="og:title" content="WebMiner — Browser-Based CPU Mining for Publishers" />
+    <meta property="og:description" content="Monetize your website with browser-based compute. No ads. No tracking. Open source. 1% fee." />
+    <meta property="og:image" content="https://earnify.mine.bz/og-image.png" />
+    <meta property="og:site_name" content="WebMiner" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WebMiner — Browser-Based CPU Mining for Publishers" />
+    <meta name="twitter:description" content="Monetize your website with browser-based compute. No ads. No tracking. Open source." />
+    <meta name="twitter:image" content="https://earnify.mine.bz/og-image.png" />
+
+    <!-- ✅ Structured Data — INSIDE <head>, not before it -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "WebMiner",
+      "url": "https://earnify.mine.bz",
+      "description": "Open-source browser-based CPU mining for web publishers. Monetize traffic without ads or tracking.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web Browser",
+      "browserRequirements": "Requires JavaScript. Supports Chrome 80+, Firefox 78+, Safari 14+, Brave.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free to use. 1% platform fee on mining revenue."
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "WebMiner"
+      },
+      "codeRepository": "https://github.com/romannnoodesl/earnify.mine.bz",
+      "license": "https://opensource.org/licenses/MIT",
+      "programmingLanguage": "JavaScript",
+      "featureList": [
+        "Browser-based CPU mining",
+        "MinotaurX, Power2B, YesPower, Yescrypt, GhostRider algorithms",
+        "Web Workers + WASM execution",
+        "Stratum V1 over WebSocket",
+        "Zero data collection",
+        "1% platform fee",
+        "Direct pool payouts"
+      ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does WebMiner cause performance degradation?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. By using navigator.hardwareConcurrency − 1, the primary UI core stays free. Less than 2% main-thread overhead. Lighthouse scores unaffected."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is WebMiner yield processed and distributed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WebMiner connects browsers directly to your configured mining pool via WebSocket stratum. Valid shares are submitted, the pool validates and credits your worker, and payouts go to your wallet. WebMiner takes only a 1% fee."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is WebMiner GDPR and CCPA compliant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. WebMiner uses zero cookies, zero localStorage, zero fingerprinting, and zero personal data collection. It operates outside GDPR cookie-consent mandates and CCPA disclosure requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does WebMiner differ from Coinhive?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WebMiner is fully open source with auditable code, charges only 1% fee vs Coinhive's 30%, connects directly to mining pools with no intermediary, and uses modern ASIC-resistant algorithms like MinotaurX and Power2B."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="theme-color" content="#09090B" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
@@ -33,6 +138,7 @@
         },
       };
     </script>
+
     <style>
       * {
         margin: 0;
