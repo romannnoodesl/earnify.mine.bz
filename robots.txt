@@ -1,6 +1,6 @@
 # ═══════════════════════════════════════════════════════════
 # robots.txt — WebMiner (earnify.mine.bz)
-# Generated: April 22, 2026
+# Updated: April 22, 2026
 # ═══════════════════════════════════════════════════════════
 
 # ─── SEARCH ENGINE CRAWLERS ───────────────────────────────
@@ -34,13 +34,16 @@ User-agent: ia_archiver
 Allow: /
 
 # ─── AI CRAWLERS (ALLOW ALL) ──────────────────────────────
-# These allow your content to surface in ChatGPT, 
+# Allows your content to surface in ChatGPT,
 # Google AI overviews, Claude, Perplexity, etc.
 
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: Google-Extended
@@ -68,29 +71,36 @@ User-agent: Bytespider
 Allow: /
 Crawl-delay: 3
 
-User-agent: OAI-SearchBot
-Allow: /
-
 # ─── SOCIAL MEDIA CRAWLERS ────────────────────────────────
 # Rich previews for Twitter, Discord, LinkedIn, etc.
+# These NEED access to your og-image.png
 
 User-agent: Twitterbot
 Allow: /
+Allow: /og-image.png
+Allow: /favicon.svg
 
 User-agent: facebookexternalhit
 Allow: /
+Allow: /og-image.png
+Allow: /favicon.svg
 
 User-agent: LinkedInBot
 Allow: /
+Allow: /og-image.png
 
 User-agent: Discordbot
 Allow: /
+Allow: /og-image.png
+Allow: /favicon.svg
 
 User-agent: TelegramBot
 Allow: /
+Allow: /og-image.png
 
 User-agent: Slackbot
 Allow: /
+Allow: /og-image.png
 
 # ─── SEO & INDEXING TOOLS ────────────────────────────────
 
@@ -113,13 +123,23 @@ User-agent: DotBot
 Allow: /
 Crawl-delay: 5
 
+# ─── IMAGE CRAWLERS ──────────────────────────────────────
+# Let Google Images index your OG image and favicon
+
+User-agent: Googlebot-Image
+Allow: /
+Allow: /og-image.png
+Allow: /favicon.svg
+
+User-agent: BingPreview
+Allow: /
+
 # ─── GENERAL RULES (CATCH-ALL) ────────────────────────────
 User-agent: *
 Allow: /
 
 # ─── BLOCKED PATHS ────────────────────────────────────────
-# No sensitive directories to block since this is a single-page site,
-# but blocking common junk paths that scanners probe
+# Common junk paths that scanners probe
 
 Disallow: /wp-admin/
 Disallow: /wp-login.php
@@ -130,6 +150,17 @@ Disallow: /admin/
 Disallow: /cgi-bin/
 Disallow: /api/telegram/
 Disallow: /*?ref=*
+
+# ─── EXPLICITLY ALLOWED ASSETS ────────────────────────────
+# Ensure crawlers can always reach these
+
+Allow: /favicon.svg
+Allow: /favicon.png
+Allow: /favicon.ico
+Allow: /og-image.png
+Allow: /apple-touch-icon.png
+Allow: /robots.txt
+Allow: /sitemap.xml
 
 # ─── SITEMAP LOCATION ─────────────────────────────────────
 Sitemap: https://earnify.mine.bz/sitemap.xml
