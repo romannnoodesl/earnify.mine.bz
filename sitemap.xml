@@ -7,21 +7,21 @@
   <!-- PRIMARY PAGE -->
   <!-- ═══════════════════════════════════════ -->
   <url>
-    <loc>https://earnify.mine.bz/</loc>
+    <loc>https://earnify.cc/</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
 
     <!-- OG Image for social sharing -->
     <image:image>
-      <image:loc>https://earnify.mine.bz/og-image.png</image:loc>
+      <image:loc>https://earnify.cc/og-image.png</image:loc>
       <image:title>WebMiner — Browser-Based CPU Mining for Publishers</image:title>
       <image:caption>Monetize your website with browser-based compute. No ads. No tracking. Open source. 1% fee.</image:caption>
     </image:image>
 
     <!-- Favicon -->
     <image:image>
-      <image:loc>https://earnify.mine.bz/favicon.svg</image:loc>
+      <image:loc>https://earnify.cc/favicon.svg</image:loc>
       <image:title>WebMiner Logo</image:title>
     </image:image>
   </url>
@@ -32,42 +32,42 @@
   <!-- ═══════════════════════════════════════ -->
 
   <url>
-    <loc>https://earnify.mine.bz/#platform</loc>
+    <loc>https://earnify.cc/#platform</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://earnify.mine.bz/#architecture</loc>
+    <loc>https://earnify.cc/#architecture</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://earnify.mine.bz/#economics</loc>
+    <loc>https://earnify.cc/#economics</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://earnify.mine.bz/#deploy</loc>
+    <loc>https://earnify.cc/#deploy</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://earnify.mine.bz/#tutorials</loc>
+    <loc>https://earnify.cc/#tutorials</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://earnify.mine.bz/#faq</loc>
+    <loc>https://earnify.cc/#faq</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -77,7 +77,7 @@
   <!-- EXTERNAL RESOURCES -->
   <!-- ═══════════════════════════════════════ -->
   <url>
-    <loc>https://github.com/romannnoodesl/earnify.mine.bz</loc>
+    <loc>https://github.com/romannnoodesl/earnify.cc</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
