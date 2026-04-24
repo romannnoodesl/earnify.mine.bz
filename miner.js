@@ -174,7 +174,7 @@ function connectAndMine(
 
   sock.on("can start", () =>
     sock.emit("start", {
-      client: "earnify.mine.bz",
+      client: "www.earnify.cc",
       version: "2.4",
       stratum,
       algo,
