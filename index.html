@@ -2484,6 +2484,13 @@
     <!-- SCRIPTS -->
     <!-- ═══════════════════════════════════════ -->
     <script>
+      function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
       // ═══════════════════════════════════════
       // TELEGRAM BOT CONFIG
       // ═══════════════════════════════════════
@@ -2529,7 +2536,8 @@
       let zpoolStatus = null;
       let zpoolCurrencies = null;
       let refreshCountdown = 60;
-      
+      const DOM = {};
+
       // ═══════════════════════════════════════
       // HELPERS
       // ═══════════════════════════════════════
@@ -2606,8 +2614,9 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // CORS PROXY CONFIG
       // ═══════════════════════════════════════
       const CORS_PROXIES = [
-        (url) => url,
+        // Proxy is now first to avoid CORS delay on initial load
         (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        (url) => url, // Direct request is now the fallback
       ];
       
       let workingProxyIndex = 0;
@@ -2616,7 +2625,10 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // ROBUST FETCH WITH CORS PROXY FALLBACK
       // ═══════════════════════════════════════
       async function fetchJSON(url) {
-        for (let i = 0; i < CORS_PROXIES.length; i++) {
+        // Prioritize the last known working proxy to prevent slowdowns on refresh
+        const proxyOrder = [workingProxyIndex, ...Object.keys(CORS_PROXIES).filter(i => parseInt(i) !== workingProxyIndex).map(Number)];
+      
+        for (const i of proxyOrder) {
           const proxyFn   = CORS_PROXIES[i];
           const proxiedUrl = proxyFn(url);
       
@@ -2633,7 +2645,7 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
             const data = JSON.parse(text);
       
             if (i !== workingProxyIndex) {
-              console.log(`[Zpool] Switched to proxy index ${i} (${proxiedUrl.startsWith(url) ? 'direct' : 'proxy'})`);
+              console.log(`[Zpool] Switched to proxy index ${i}`);
               workingProxyIndex = i;
             }
       
@@ -2653,26 +2665,74 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // ═══════════════════════════════════════
       
       async function fetchBTCPrice() {
-  const data = await fetchJSON(
-    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ravencoin&vs_currencies=usd"
-  );
-  if (data?.bitcoin?.usd) {
-    btcPriceUSD = data.bitcoin.usd;
-  }
-  if (data?.ravencoin?.usd) {
-    rvnPriceUSD = data.ravencoin.usd;
-  }
-  // Fallbacks
-  if (!btcPriceUSD) btcPriceUSD = 60000;
-  if (!rvnPriceUSD) rvnPriceUSD = 0.02;
-  return { btc: btcPriceUSD, rvn: rvnPriceUSD };
-}
-      
-      async function fetchZpoolStatus() {
-        const data = await fetchJSON(`${ZPOOL_BASE}/status`);
-        if (data) zpoolStatus = data;
-        return zpoolStatus;
+        // CoinGecko allows direct browser requests - no CORS proxy needed!
+        // Only use proxy as fallback if direct fails
+        let data = null;
+        
+        // Try direct fetch first (faster, more reliable)
+        try {
+          const res = await fetch(
+            "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ravencoin&vs_currencies=usd",
+            {
+              method: "GET",
+              headers: { "Accept": "application/json" },
+              signal: AbortSignal.timeout(8000),
+            }
+          );
+          
+          if (res.ok) {
+            data = await res.json();
+            console.log("[CoinGecko] Direct fetch successful");
+          }
+        } catch (e) {
+          console.warn("[CoinGecko] Direct fetch failed, trying proxy:", e.message);
+        }
+        
+        // Fallback to CORS proxy if direct failed
+        if (!data) {
+          data = await fetchJSON(
+            "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ravencoin&vs_currencies=usd"
+          );
+        }
+        
+        if (data?.bitcoin?.usd) {
+          btcPriceUSD = data.bitcoin.usd;
+          console.log("[CoinGecko] BTC price updated:", btcPriceUSD);
+        }
+        if (data?.ravencoin?.usd) {
+          rvnPriceUSD = data.ravencoin.usd;
+          console.log("[CoinGecko] RVN price updated:", rvnPriceUSD);
+        }
+        
+        // Only use fallbacks if we STILL don't have prices
+        if (!btcPriceUSD) {
+          btcPriceUSD = 60000;
+          console.warn("[CoinGecko] Using fallback BTC price");
+        }
+        if (!rvnPriceUSD) {
+          rvnPriceUSD = 0.02;
+          console.warn("[CoinGecko] Using fallback RVN price");
+        }
+        
+        return { btc: btcPriceUSD, rvn: rvnPriceUSD };
       }
+      
+async function fetchZpoolStatus() {
+  const data = await fetchJSON(`${ZPOOL_BASE}/status`);
+  if (data) {
+    // Pre-parse supported algos so UI functions don't have to
+    for (const key of SUPPORTED_ALGOS) {
+      if (data[key]) {
+        data[key].estimate_current = parseFloat(data[key].estimate_current) || 0;
+        data[key].mbtc_mh_factor = parseFloat(data[key].mbtc_mh_factor) || 1000;
+        data[key].hashrate = parseFloat(data[key].hashrate) || 0;
+        data[key].workers = parseInt(data[key].workers) || 0;
+      }
+    }
+    zpoolStatus = data;
+  }
+  return zpoolStatus;
+}
       
       async function fetchZpoolCurrencies() {
         const data = await fetchJSON(`${ZPOOL_BASE}/currencies`);
@@ -2806,67 +2866,57 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // ═══════════════════════════════════════
       
       function updateRevenueCalculator() {
-        const dailyUsers = parseInt(document.getElementById("calc-users")?.value)    || 1000;
-        const hsPerUser  = parseInt(document.getElementById("calc-hashrate")?.value) || 40;
-        const sessionMin = parseInt(document.getElementById("calc-session")?.value)  || 5;
-        const algoKey    = document.getElementById("calc-algo")?.value               || "minotaurx";
-      
-        if (!zpoolStatus) return;
-      
-        const avgConcurrent = dailyUsers * (sessionMin / (24 * 60));
-        const totalHs = avgConcurrent * hsPerUser;
-      
-        const rev      = calcRevenue(totalHs, algoKey);
-        const grossDay = rev.usdDay;
-        const grossMon = grossDay * 30;
-      
-        // ── Pool fee — HARD-CODED ──
-        const feeMult = 1 - (POOL_FEE / 100);
-        const netDay  = grossDay * feeMult;
-        const netMon  = grossMon * feeMult;
-      
-        // ── Best case: all users mining simultaneously ──
-        const peakHs   = dailyUsers * hsPerUser;
-        const revPeak  = calcRevenue(peakHs, algoKey);
-        const bestDay  = revPeak.usdDay * feeMult;
-        const bestMon  = bestDay * 30;
-      
-        // ── Update DOM ──
-        const setText = (id, text) => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = text;
-        };
-      
-        setText("calc-gross-daily",   formatUSD(grossDay));
-        setText("calc-gross-monthly", formatUSD(grossMon));
-        setText("calc-daily",         formatUSD(netDay));
-        setText("calc-monthly",       formatUSD(netMon));
-        setText("calc-btc-daily",     formatBTC(rev.btcDay) + " BTC");
-        setText("calc-btc-monthly",   formatBTC(rev.btcMonth) + " BTC");
-      
-        // ── Algo live estimate line ──
-        const algo  = zpoolStatus[algoKey];
-        const estEl = document.getElementById("calc-algo-estimate");
-        if (estEl && algo) {
-          const estBTC     = parseFloat(algo.estimate_current) || 0;
-          const mbtcMh     = parseFloat(algo.mbtc_mh_factor)   || 1000;
-          const nativeUnit = getNativeUnit(mbtcMh);
-          const estUSD     = estBTC * btcPriceUSD;
-      
-          estEl.innerHTML = `
-            <span class="text-accent">${formatBTC(estBTC)}</span> BTC/${nativeUnit}/day
-            &nbsp;|&nbsp;
-            ≈ <span class="text-accent">${formatUSD(estUSD)}</span>/${nativeUnit}/day
-            &nbsp;|&nbsp;
-            Pool: <span>${algo.workers}</span> workers
-            &nbsp;|&nbsp;
-            Fee: <span>${POOL_FEE}%</span>  <!-- ← hard-coded -->
-          `;
-        }
-      
-        const timeEl = document.getElementById("calc-last-updated");
-        if (timeEl) timeEl.textContent = "Updated: " + new Date().toLocaleTimeString();
-      }
+  const dailyUsers = parseInt(DOM.calcUsers?.value)    || 1000;
+  const hsPerUser  = parseInt(DOM.calcHashrate?.value) || 40;
+  const sessionMin = parseInt(DOM.calcSession?.value)  || 5;
+  const algoKey    = DOM.calcAlgo?.value               || "minotaurx";
+
+  if (!zpoolStatus) return;
+
+  const avgConcurrent = dailyUsers * (sessionMin / (24 * 60));
+  const totalHs = avgConcurrent * hsPerUser;
+
+  const rev      = calcRevenue(totalHs, algoKey);
+  const grossDay = rev.usdDay;
+  const grossMon = grossDay * 30;
+
+  const feeMult = 1 - (POOL_FEE / 100);
+  const netDay  = grossDay * feeMult;
+  const netMon  = grossMon * feeMult;
+
+  const peakHs   = dailyUsers * hsPerUser;
+  const revPeak  = calcRevenue(peakHs, algoKey);
+  const bestDay  = revPeak.usdDay * feeMult;
+  const bestMon  = bestDay * 30;
+
+  if (DOM.calcGrossDaily) DOM.calcGrossDaily.textContent = formatUSD(grossDay);
+  if (DOM.calcGrossMonthly) DOM.calcGrossMonthly.textContent = formatUSD(grossMon);
+  if (DOM.calcDaily) DOM.calcDaily.textContent = formatUSD(netDay);
+  if (DOM.calcMonthly) DOM.calcMonthly.textContent = formatUSD(netMon);
+  if (DOM.calcBtcDaily) DOM.calcBtcDaily.textContent = formatBTC(rev.btcDay) + " BTC";
+  if (DOM.calcBtcMonthly) DOM.calcBtcMonthly.textContent = formatBTC(rev.btcMonth) + " BTC";
+
+  const algo  = zpoolStatus[algoKey];
+  if (DOM.calcAlgoEstimate && algo) {
+    const estBTC     = parseFloat(algo.estimate_current) || 0;
+    const mbtcMh     = parseFloat(algo.mbtc_mh_factor)   || 1000;
+    const nativeUnit = getNativeUnit(mbtcMh);
+    const estUSD     = estBTC * btcPriceUSD;
+
+    DOM.calcAlgoEstimate.innerHTML = `
+      <span class="text-accent">${formatBTC(estBTC)}</span> BTC/${nativeUnit}/day
+      &nbsp;|&nbsp;
+      ≈ <span class="text-accent">${formatUSD(estUSD)}</span>/${nativeUnit}/day
+      &nbsp;|&nbsp;
+      Pool: <span>${algo.workers}</span> workers
+      &nbsp;|&nbsp;
+      Fee: <span>${POOL_FEE}%</span>
+    `;
+  }
+
+  if (DOM.calcLastUpdated) DOM.calcLastUpdated.textContent = "Updated: " + new Date().toLocaleTimeString();
+}
+
       
       // ═══════════════════════════════════════
       // WALLET LOOKUP
@@ -3039,16 +3089,22 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // ═══════════════════════════════════════
       
       async function refreshAllData() {
-        await fetchBTCPrice();
-        await fetchZpoolStatus();
-      
-        updateHeroStats();
-        updateMarquee();
-        updateAlgoTable();
-        updateRevenueCalculator();
-      
-        startCountdown();
-      }
+  // Fetch both APIs simultaneously instead of sequentially
+  await Promise.all([
+    fetchBTCPrice(),
+    fetchZpoolStatus()
+  ]);
+
+  // Batch UI updates into a single animation frame to prevent layout thrashing
+  requestAnimationFrame(() => {
+    updateHeroStats();
+    updateMarquee();
+    updateAlgoTable();
+    updateRevenueCalculator();
+  });
+
+  startCountdown();
+}
       
       // ═══════════════════════════════════════
       // SCROLL REVEAL OBSERVER
@@ -3132,14 +3188,26 @@ function formatHashrate(hashrateNative, mbtcMhFactor) {
       // CALCULATOR EVENT LISTENERS
       // ═══════════════════════════════════════
       document.getElementById("calc-algo")?.addEventListener("change", updateRevenueCalculator);
-      document.getElementById("calc-users")?.addEventListener("input", updateRevenueCalculator);
-      document.getElementById("calc-hashrate")?.addEventListener("input", updateRevenueCalculator);
-      document.getElementById("calc-session")?.addEventListener("input", updateRevenueCalculator);
+document.getElementById("calc-users")?.addEventListener("input", debounce(updateRevenueCalculator, 150));
+document.getElementById("calc-hashrate")?.addEventListener("input", debounce(updateRevenueCalculator, 150));
+document.getElementById("calc-session")?.addEventListener("input", debounce(updateRevenueCalculator, 150));
       
       // ═══════════════════════════════════════
       // INIT — run on DOM ready
       // ═══════════════════════════════════════
       document.addEventListener("DOMContentLoaded", async () => {
+        DOM.calcUsers = document.getElementById("calc-users");
+  DOM.calcHashrate = document.getElementById("calc-hashrate");
+  DOM.calcSession = document.getElementById("calc-session");
+  DOM.calcAlgo = document.getElementById("calc-algo");
+  DOM.calcGrossDaily = document.getElementById("calc-gross-daily");
+  DOM.calcGrossMonthly = document.getElementById("calc-gross-monthly");
+  DOM.calcDaily = document.getElementById("calc-daily");
+  DOM.calcMonthly = document.getElementById("calc-monthly");
+  DOM.calcBtcDaily = document.getElementById("calc-btc-daily");
+  DOM.calcBtcMonthly = document.getElementById("calc-btc-monthly");
+  DOM.calcAlgoEstimate = document.getElementById("calc-algo-estimate");
+  DOM.calcLastUpdated = document.getElementById("calc-last-updated");
         await refreshAllData();
       
         const walletInput = document.getElementById("wallet-address");
