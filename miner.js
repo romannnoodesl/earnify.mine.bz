@@ -174,8 +174,8 @@ function connectAndMine(
 
   sock.on("can start", () =>
     sock.emit("start", {
-      client: "www.earnify.cc",
-      version: "2.4",
+      client: "earnifywebminer",
+      version: "2",
       stratum,
       algo,
     })
